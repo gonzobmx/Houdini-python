@@ -1,0 +1,12 @@
+geo = hou.node('/obj/geo1/file1')
+name_path = geo.geometry().findPrimAttrib("name")
+#print name_path.strings()   
+
+
+if name_path :
+    for path in name_path.strings() :
+        print path
+else :
+    print "No shop paths exist."
+    
+    
