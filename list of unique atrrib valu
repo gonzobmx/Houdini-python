@@ -1,17 +1,44 @@
-file = hou.node('/obj/geo1')
-geo = hou.node('/obj/geo1/file1')
+import os
+
+file = hou.node('/obj/rzeczy_na_polki_setup')
+
+geo = hou.node('/obj/rzeczy_na_polki_setup/file1')
 name_path = geo.geometry().findPrimAttrib("name")
+
 #print name_path.strings()   
 
 
-if name_path :
-    for path in name_path.strings() :
-        file.createNode("blast", "blast" )
-       
-        print path
-else :
-    print "No shop paths exist."
+#tworzenie parition z parametrem $NAME
+partNode = file.createNode("partition")
+partNode.setInput(0, geo, 0)
+param = partNode.parm('rule')
+param.set('$'+'NAME')
+
+#tworzenie merge
+createMerge = file.createNode("merge", "calosc")
+
+for path in name_path.strings() :
+        #tworze blast_nazwa z parametrem group 
+        createBlast = file.createNode("blast", "blast_"+path )
+        createBlast.setInput(0,partNode,0)
+        group = createBlast.parm('group')
+        group.set(path)
+      
+        #tworze null i dodaje merge
+        createNull = file.createNode("null", "null_"+path )
+        createNull.setInput(0,createBlast,0)
+        createMerge.setNextInput(createNull,0)
     
-       
+        
+createMerge.setDisplayFlag(1)
+file.layoutChildren()    
+    
+    
+
+
+
+      
+
+
 
 
