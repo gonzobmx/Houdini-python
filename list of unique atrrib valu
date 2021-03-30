@@ -1,11 +1,24 @@
 import os
 
-file = hou.node('/obj/rzeczy_na_polki_setup')
 
-geo = hou.node('/obj/rzeczy_na_polki_setup/file1')
+#zacigam sciezke z selekcji
+for node in hou.selectedNodes():
+    a=node.path()
+
+
+#dodać sciezki
+geo = hou.node(a)
+file = geo.node('..')
+
+#robie null - to_out
+createOut= file.createNode("null", "to_out")
+
+#dodać sciezki
+out =  hou.node('/../../to_out')
 name_path = geo.geometry().findPrimAttrib("name")
 
-#print name_path.strings()   
+
+#print (file)
 
 
 #tworzenie parition z parametrem $NAME
@@ -14,31 +27,43 @@ partNode.setInput(0, geo, 0)
 param = partNode.parm('rule')
 param.set('$'+'NAME')
 
+
 #tworzenie merge
 createMerge = file.createNode("merge", "calosc")
 
 for path in name_path.strings() :
-        #tworze blast_nazwa z parametrem group 
+        #tworze blast_nazwa z parametrem group i delete unused group
         createBlast = file.createNode("blast", "blast_"+path )
         createBlast.setInput(0,partNode,0)
         group = createBlast.parm('group')
         group.set(path)
+        negate = createBlast.parm('negate')
+        negate.set(1)
+        delet = createBlast.parm('removegrp')
+        delet.set(1)  
+        #dopisać dlete when no selected
       
         #tworze null i dodaje merge
-        createNull = file.createNode("null", "null_"+path )
+        createNull = file.createNode("null", ""+path )
         createNull.setInput(0,createBlast,0)
         createMerge.setNextInput(createNull,0)
     
-        
-createMerge.setDisplayFlag(1)
+#stawiam flage        
+createOut.setDisplayFlag(1)
+
+#lacze null z mergem
+
+createOut.setInput(0,createMerge,0)
+
+
+#ukladam
 file.layoutChildren()    
-    
+   
     
 
 
 
       
-
 
 
 
