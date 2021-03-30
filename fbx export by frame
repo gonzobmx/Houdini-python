@@ -1,0 +1,10 @@
+for node in hou.selectedNodes():
+    a=node.path()
+    
+fbx = hou.node(a)
+print fbx
+fr=`chs("fr")`
+
+for i in range(1,fr+1):
+    hou.setFrame(i)
+    render=fbx.parm('execute').pressButton()
